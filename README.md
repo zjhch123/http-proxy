@@ -2,6 +2,7 @@
 
 原理图：
 
+<img src="https://raw.githubusercontent.com/zjhch123/http-proxy/master/doc/demo.png" width="600"/>
 
 需要准备的：
 1. 公网VPS服务器
