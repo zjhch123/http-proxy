@@ -8,9 +8,9 @@ const client = new net.Socket();
 
 
 const r = (data) => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     setTimeout(() => {
-      reject([`HTTP/1.1 200 OK`, ``, `timeout`].join('\n'))
+      resolve([`HTTP/1.1 200 OK`, ``, `timeout`].join('\n'))
     }, 5000);
     const c = new net.Socket()
     c.connect(8997, '127.0.0.1')
