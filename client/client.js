@@ -1,38 +1,41 @@
 const net = require('net');
-const request = require('request');
+const request = require('./request')
 
-const TARGET = '192.168.1.100';
+const TARGET = '127.0.0.1';
 const PORT = 9876;
 
 const client = new net.Socket();
+client.setNoDelay(true)
 
+const r = request('127.0.0.1', 3000)
 
-const r = (data) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([`HTTP/1.1 200 OK`, ``, `timeout`].join('\n'))
-    }, 5000);
-    const c = new net.Socket()
-    c.connect(8997, '127.0.0.1')
-    c.write(data)
-    c.on('data', (recv) => {
-      c.destroy()
-      resolve(recv.toString())
-    })
+const sendData = (startIndex, step, key, data, finishCb) => {
+  const packet = data.slice(startIndex, startIndex + step)
+  client.write(key + '\n' + packet, () => {
+    startIndex += step
+    if (startIndex > data.length) {
+      finishCb()
+    } else {
+      sendData(startIndex, step, key, data, finishCb)
+    }
   })
 }
 
-
 client.connect(PORT, TARGET, function() {
-  console.log('连接成功')
+  console.log('服务端连接成功')
 })
 
-
 client.on('data', async (data) => {
-  const raw = data.toString().split('\n')
+  console.log('---- 接收到来自服务端的消息: ----')
+  const raw = data.toString().split('\n', 2)
   const key = raw[0]
-  const body = raw.slice(1).join('\n')
-
-  const retVal = await r(body)
-  client.write(key + '\n' + retVal)
+  const body = raw[1]
+  console.log(key)
+  console.log(body)
+  console.log('-----------------------------')
+  const res = await r(body)
+  sendData(0, 80, key, res, () => {
+    client.write(key + '\n' + 'over!over')
+    console.log('返回包发送完成')
+  })
 })
