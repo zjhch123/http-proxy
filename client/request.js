@@ -8,8 +8,9 @@ const request = (ip, port) => {
     if (raw.startsWith('get') && !r.test(raw)) {
       data = data.trim().split('\n')
       data.push('Connection: close')
-      data = data.join('\r\n') + '\r\n\r\n'
+      data = data.join('\n') + '\r\n\r\n'
     }
+    console.log(data)
     return new Promise(resolve => {
       const c = net.connect(port, ip, function() {
         let retValue = ''
@@ -34,8 +35,8 @@ const request = (ip, port) => {
 
 // test
 // ;(async () => {
-//   const r = request('127.0.0.1', 3000)
-//   const res = await r('GET / HTTP/1.1\r\n\r\n')
+//   const r = request('117.144.227.61', 80)
+//   const res = await r('GET / HTTP/1.1\nHost: www.ip138.com\nUser-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36\nAccept: */*')
 //   console.log(res)
 // })()
 

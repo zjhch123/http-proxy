@@ -5,6 +5,7 @@ new Promise((resolve) => {
   const server = net.createServer()
   server.on('connection', (socket) => {
     console.log('测试机连接成功')
+    socket.setNoDelay(true)
     resolve(socket)
   })
   server.listen(9876, '0.0.0.0')
@@ -12,7 +13,7 @@ new Promise((resolve) => {
   const public = net.createServer()
   console.log('开始监听连接')
   public.listen(6543)
-  return { public: public, private: privateSocket }
+  return { public, private: privateSocket }
 }).then(({ public, private: privateSocket }) => {
   const publicSocketPool = {}
   const publicSocketRet = {}
@@ -35,19 +36,18 @@ new Promise((resolve) => {
 
   })
   privateSocket.on('data', (data) => {
-    console.log(data.length)
-    const raw = data.toString().split('\n', 2)
+    const raw = data.toString().split('\n')
     const key = raw[0]
-    const body = data.toString().split(key + '\n').join('')
-    if (body === 'over!over' || body.indexOf('over!over') !== -1) {
-      // console.log(publicSocketRet[key])
-      if (body !== 'over!over') {
-        publicSocketRet[key] += body.split('over!over')[0]
-      }
+    const body = raw.slice(1).join('\n')
+    console.log('----')
+    console.log(body)
+    console.log('----')
+    publicSocketRet[key] += body
+
+    if (publicSocketRet[key].endsWith('over!over')) {
+      console.log('请求结束:' + key)
+      publicSocketRet[key] = publicSocketRet[key].split(key + '\n').join('').replace('over!over', '')
       publicSocketPool[key] && publicSocketPool[key].end(publicSocketRet[key])
-      
-    } else {
-      publicSocketRet[key] += body
     }
   })
 })
