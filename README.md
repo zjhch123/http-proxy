@@ -11,3 +11,13 @@
 2. 服务器上的Node环境(>=8.0)
 
 主要功能还没有封装
+
+## usage
+
+```
+// server:
+node server -p 9999 -t 6789
+
+// client:
+node client.js -s 127.0.0.1:6789 -t 127.0.0.1:3000
+```
