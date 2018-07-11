@@ -52,7 +52,6 @@ new Promise((resolve) => {
         delete publicSocketPool[key]
       })
     })(key)
-
   })
   privateSocket.on('data', (data) => {
     const raw = data.toString().split('\n')
@@ -68,6 +67,10 @@ new Promise((resolve) => {
       publicSocketRet[key] = publicSocketRet[key].split(key + '\n').join('').replace('over!over', '')
       publicSocketPool[key] && publicSocketPool[key].end(publicSocketRet[key])
     }
+  })
+  privateSocket.on('end', () => {
+    console.log('测试机断开连接，程序结束')
+    process.exit(0)
   })
 })
 
